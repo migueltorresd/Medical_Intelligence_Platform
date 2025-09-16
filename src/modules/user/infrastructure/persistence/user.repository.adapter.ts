@@ -35,10 +35,10 @@ export class UserRepositoryAdapter implements UserRepositoryPort {
   }
 
   async findByRole(role: string): Promise<User[]> {
-    return await this.userRepository.find({ 
-      where: { role: role as any },
-      order: { createdAt: 'DESC' },
-    });
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+    queryBuilder.andWhere(':role = ANY(user.medicalRoles)', { role });
+    queryBuilder.orderBy('user.createdAt', 'DESC');
+    return await queryBuilder.getMany();
   }
 
   async findByStatus(status: string): Promise<User[]> {
@@ -80,6 +80,7 @@ export class UserRepositoryAdapter implements UserRepositoryPort {
     role?: string;
     status?: string;
     city?: string;
+    institutionId?: string;
   }): Promise<User[]> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
 
@@ -97,7 +98,7 @@ export class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     if (filters.role) {
-      queryBuilder.andWhere('user.role = :role', { 
+      queryBuilder.andWhere(':role = ANY(user.medicalRoles)', { 
         role: filters.role 
       });
     }
@@ -111,6 +112,12 @@ export class UserRepositoryAdapter implements UserRepositoryPort {
     if (filters.city) {
       queryBuilder.andWhere('user.city LIKE :city', { 
         city: `%${filters.city}%` 
+      });
+    }
+
+    if (filters.institutionId) {
+      queryBuilder.andWhere('user.institutionId = :institutionId', { 
+        institutionId: filters.institutionId 
       });
     }
 

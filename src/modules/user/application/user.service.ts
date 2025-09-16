@@ -1,5 +1,5 @@
 import { Injectable, Inject, NotFoundException, ConflictException } from '@nestjs/common';
-import { User, UserRole, UserStatus } from '../domain/entities/user.entity';
+import { User, UserRole, UserStatus, MedicalRole } from '../domain/entities/user.entity';
 import { UserRepositoryPort, USER_REPOSITORY_PORT } from '../domain/ports/user.repository.port';
 import * as bcrypt from 'bcryptjs';
 
@@ -10,7 +10,9 @@ export interface CreateUserData {
   age?: number;
   phone?: string;
   city?: string;
-  role?: UserRole;
+  medicalRoles?: MedicalRole[];
+  institutionId?: string;
+  createdBy?: string;
 }
 
 export interface UpdateUserData {
@@ -18,7 +20,7 @@ export interface UpdateUserData {
   age?: number;
   phone?: string;
   city?: string;
-  role?: UserRole;
+  medicalRoles?: MedicalRole[];
   status?: UserStatus;
 }
 
@@ -30,6 +32,7 @@ export interface GetAllUsersParams {
   name?: string;
   email?: string;
   city?: string;
+  institutionId?: string;
 }
 
 export interface GetAllUsersResponse {
@@ -71,8 +74,10 @@ export class UserService {
       userData.name,
       userData.email,
       hashedPassword,
+      userData.medicalRoles || [MedicalRole.USER],
       userData.age,
-      userData.role || UserRole.USER
+      userData.institutionId,
+      userData.createdBy
     );
 
     // Asignar campos opcionales
@@ -167,9 +172,11 @@ export class UserService {
       );
     }
 
-    // Cambiar rol si se especifica
-    if (updateData.role) {
-      user.changeRole(updateData.role);
+    // Cambiar roles médicos si se especifican
+    if (updateData.medicalRoles) {
+      // Limpiar roles existentes y asignar nuevos
+      user.medicalRoles = [];
+      updateData.medicalRoles.forEach(role => user.addMedicalRole(role));
     }
 
     // Cambiar estado si se especifica

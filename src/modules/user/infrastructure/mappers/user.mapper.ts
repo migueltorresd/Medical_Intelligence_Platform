@@ -1,4 +1,4 @@
-import { User } from '../../domain/entities/user.entity';
+import { User, MedicalRole } from '../../domain/entities/user.entity';
 
 /**
  * Response DTO para usuario
@@ -9,10 +9,11 @@ export interface UserResponseDto {
   name: string;
   email: string;
   age?: number;
-  role: string;
+  medicalRoles: MedicalRole[];
   status: string;
   phone?: string;
   city?: string;
+  institutionId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -33,10 +34,11 @@ export class UserMapper {
       name: user.name,
       email: user.email,
       age: user.age,
-      role: user.role,
+      medicalRoles: user.medicalRoles,
       status: user.status,
       phone: user.phone,
       city: user.city,
+      institutionId: user.institutionId,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };
