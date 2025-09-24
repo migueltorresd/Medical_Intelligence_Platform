@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './shared/persistencia/database/database.module';
 import { UserModule } from './modules/user/user.module';
+import { PatientModule } from './modules/patient/patient.module';
 import { AuthModule } from './shared/auth/auth.module';
 import { LoggerMiddleware } from './shared/middlewares/logger.middleware';
 import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
@@ -29,6 +30,7 @@ import { GlobalExceptionFilter } from './shared/filters/global-exception.filter'
     
     // Módulos de dominio
     UserModule,
+    PatientModule,
   ],
   controllers: [AppController],
   providers: [
